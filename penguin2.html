@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chan-Chan Jump!</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
+        body {
+            text-align: center;
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            background-image: url('Images/penguin-background.png');
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        h1 {
+            font-size: 48px;
+            font-weight: 600;
+            color: white;
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7);
+            background: rgba(0, 0, 0, 0.3);
+            padding: 10px 20px;
+            border-radius: 10px;
+        }
+
+        .game-container {
+            position: relative;
+            width: 1500px;
+            height: 800px;
+            border: 3px solid white;
+            overflow: hidden;
+            background-color: skyblue;
+        }
+
+        .penguin {
+            position: absolute;
+            width: 200px;
+            left: 50px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .mountain {
+            position: absolute;
+            width: 80px;
+            height: 120px;
+            background: linear-gradient(45deg, #808080, #a9a9a9);
+            border-radius: 50% 50% 0 0;
+        }
+
+        .mountain.upper {
+            transform: rotate(180deg);
+            background: linear-gradient(45deg, #696969, #808080);
+        }
+
+        .score-container {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.5);
+            padding: 10px;
+            border-radius: 5px;
+            color: white;
+            font-size: 20px;
+        }
+
+        .game-over {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .start-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 24px;
+            color: white;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 15px;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Chan-Chan Jump!</h1>
+
+    <div class="game-container" id="gameContainer">
+        <img src="Images/penguin.png" class="penguin" id="penguin">
+        <div class="score-container">Score: <span id="score">0</span></div>
+        <div class="game-over" id="gameOver">
+            <p>Game Over!</p>
+            <p>Press Space to Play Again</p>
+        </div>
+        <div class="start-text" id="startText">Press Space to Start <p>Reach score 25</p></div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const penguin = document.getElementById("penguin");
+            const gameContainer = document.getElementById("gameContainer");
+            const gameOverScreen = document.getElementById("gameOver");
+            const scoreDisplay = document.getElementById("score");
+            const startText = document.getElementById("startText");
+
+            let gravity = 0.2;
+            let velocity = 0;
+            let jumpStrength = -6.7;
+            let score = 0;
+            let gameRunning = false;
+            let gameStarted = false;
+            let mountains = [];
+            let floating = false;
+
+            function flap() {
+                if (!gameRunning || floating) return;
+                velocity = jumpStrength;
+            }
+
+            function gameLoop() {
+                if (!gameRunning) return;
+
+                if (!floating) {
+                    velocity += gravity;
+                }
+
+                penguin.style.top = `${penguin.offsetTop + velocity}px`;
+
+                if (penguin.offsetTop + penguin.clientHeight >= gameContainer.clientHeight || penguin.offsetTop <= 0) {
+                    endGame();
+                }
+
+                mountains.forEach(mountain => {
+                    mountain.style.left = `${mountain.offsetLeft - 2}px`;
+
+                    if (mountain.offsetLeft + 80 < 0) {
+                        mountain.remove();
+                        mountains = mountains.filter(m => m !== mountain);
+                        score++;
+                        scoreDisplay.textContent = score;
+
+                        // Redirect when score reaches 25
+                        if (score >= 25) {
+                            window.location.href = "penguin3.html";
+                        }
+                    }
+
+                    if (checkCollision(penguin, mountain)) {
+                        endGame();
+                    }
+                });
+
+                requestAnimationFrame(gameLoop);
+            }
+
+            function createMountains() {
+                if (!gameRunning) return;
+
+                let gap = 220;
+                let minHeight = 100;
+                let maxHeight = 250;
+
+                function generateMountain() {
+                    let mountainHeight = Math.floor(Math.random() * (maxHeight - minHeight) + minHeight);
+
+                    let mountainBottom = document.createElement("div");
+                    let mountainTop = document.createElement("div");
+
+                    mountainBottom.classList.add("mountain");
+                    mountainTop.classList.add("mountain", "upper");
+
+                    mountainBottom.style.height = `${mountainHeight}px`;
+                    mountainBottom.style.left = "800px";
+                    mountainBottom.style.bottom = "0";
+
+                    mountainTop.style.height = `${500 - (mountainHeight + gap)}px`;
+                    mountainTop.style.left = "800px";
+                    mountainTop.style.top = "0";
+
+                    gameContainer.appendChild(mountainBottom);
+                    gameContainer.appendChild(mountainTop);
+                    mountains.push(mountainBottom, mountainTop);
+                }
+
+                generateMountain();
+                setTimeout(generateMountain, 1000);
+                setTimeout(generateMountain, 2000);
+                setTimeout(createMountains, Math.random() * 2000 + 2500);
+            }
+
+            function checkCollision(penguin, mountain) {
+                let penguinRect = penguin.getBoundingClientRect();
+                let mountainRect = mountain.getBoundingClientRect();
+
+                return !(
+                    penguinRect.right < mountainRect.left ||
+                    penguinRect.left > mountainRect.right ||
+                    penguinRect.bottom < mountainRect.top ||
+                    penguinRect.top > mountainRect.bottom
+                );
+            }
+
+            function endGame() {
+                gameRunning = false;
+                gameOverScreen.style.display = "block";
+            }
+
+            function resetGame() {
+                location.reload();
+            }
+
+            function startGame() {
+                if (!gameStarted) {
+                    gameStarted = true;
+                    gameRunning = true;
+                    startText.style.display = "none";
+                    gameOverScreen.style.display = "none";
+                    score = 0;
+                    scoreDisplay.textContent = score;
+                    mountains.forEach(mountain => mountain.remove());
+                    mountains = [];
+                    penguin.style.top = "50%";
+                    velocity = 0;
+
+                    floating = true;
+                    setTimeout(() => {
+                        floating = false;
+                    }, 80);
+
+                    gameLoop();
+                    createMountains();
+                }
+            }
+
+            document.addEventListener("keydown", event => {
+                if (event.code === "Space") {
+                    if (!gameStarted) {
+                        startGame();
+                    } else if (!gameRunning) {
+                        resetGame();
+                    } else {
+                        flap();
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

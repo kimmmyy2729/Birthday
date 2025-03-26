@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz About Sayang</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Video Background */
+        .video-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -1;
+        }
+
+        .quiz-container {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 360px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .question {
+            font-size: 20px;
+            margin-bottom: 15px;
+        }
+
+        .options button {
+            background-color: #C7A07A;
+            color: white;
+            border: none;
+            padding: 15px;
+            margin: 5px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s;
+            font-size: 18px;
+        }
+
+        .options button:hover {
+            background-color: #391E10;
+        }
+
+        .result {
+            font-size: 16px;
+            margin-top: 10px;
+            font-weight: bold;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Video Background -->
+    <video class="video-background" autoplay loop muted>
+        <source src="Videos/quiz-background.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+
+    <div class="quiz-container">
+        <div class="question" id="question">Loading question...</div>
+        <div class="options">
+            <button onclick="checkAnswer(true)" id="option1">Option 1</button>
+            <button onclick="checkAnswer(false)" id="option2">Option 2</button>
+        </div>
+        <div class="result" id="result"></div>
+    </div>
+
+    <script>
+        const questions = [
+            { q: "Pasta or Pizza sayang lagi suka?", a1: "🍕Pizza", a2: "🍝Pasta", correct: "🍕Pizza" },
+            { q: "Kalau sayang mad sayang suka buat apa?", a1: "Scroll Tiktok", a2: "Gigit baby", correct: "Scroll Tiktok" },
+            { q: "Kalau eat tembikai sayang suka canee", a1: "Potong patu eat terus", a2: "Letak dalam peti patu makan pakai suduu", correct: "Letak dalam peti patu makan pakai suduu" },
+            { q: "Mana satu sayang lagi sukaa?", a1: "Cleep💤", a2: "Tengok Drama", correct: "Cleep💤" },
+            { q: "Kalau apam balik Sayang suka canee", a1: "Extra Jagungg🌽", a2: "Extra kacangg🥜", correct: "Extra Jagungg🌽" },
+            { q: "Last question : Siapa Mirachan lagi Sayang", a1: "Baby boo🥝", a2: "Gunther🐧", correct: "Baby boo🥝" }
+        ];
+        
+        let currentQuestion = 0;
+
+        function loadQuestion() {
+            const qData = questions[currentQuestion];
+            document.getElementById("question").innerText = qData.q;
+            document.getElementById("option1").innerText = qData.a1;
+            document.getElementById("option2").innerText = qData.a2;
+        }
+
+        function checkAnswer(isFirstOption) {
+            const qData = questions[currentQuestion];
+            const selectedAnswer = isFirstOption ? qData.a1 : qData.a2;
+            if (selectedAnswer === qData.correct) {
+                document.getElementById("result").innerText = "Yeayy BETULLL Sayangg! ";
+                document.getElementById("result").style.color = "#28a745";
+            } else {
+                document.getElementById("result").innerText = "Aippp Biacee Calahh niii😤";
+                document.getElementById("result").style.color = "#dc3545";
+            }
+            setTimeout(nextQuestion, 2000);
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion < questions.length) {
+                loadQuestion();
+                document.getElementById("result").innerText = "";
+            } else {
+                document.querySelector(".quiz-container").innerHTML = "<h2>HIHI Congrats Sayangg dah abishh, I LOVE YOU MY BABY BOO ❤️❤️❤️❤️</h2>";
+            }
+        }
+
+        loadQuestion();
+    </script>
+</body>
+</html>

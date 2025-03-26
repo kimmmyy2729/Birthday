@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>找到糖果</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
+        body {
+            background: url('Images/background-candy-game.png') no-repeat center center/cover;
+            font-family: 'Poppins', sans-serif;
+            text-align: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .box {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            text-align: center;
+            width: 350px;
+            max-width: 95%;
+            min-height: 400px;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        .popup p {
+            margin-bottom: 20px;
+        }
+
+        .popup img {
+            width: 100%;
+            max-width: 280px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        button {
+            background-color: #FF6699;
+            color: white;
+            border: none;
+            padding: 12px 16px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background 0.3s ease, transform 0.2s;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #FF3366;
+            transform: scale(1.05);
+        }
+
+        .game-container {
+            display: none;
+            position: relative;
+            text-align: center;
+        }
+
+        .fist-container {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 30px;
+            position: relative;
+            width: 100%;
+            height: 120px;
+        }
+
+        .fist {
+            width: 100px;
+            cursor: pointer;
+            transition: transform 0.3s ease, left 1s ease-in-out, top 1s ease-in-out;
+            position: absolute;
+        }
+
+        .fist:hover {
+            transform: scale(1.15);
+        }
+
+        .candy {
+            width: 100px;
+            position: absolute;
+            visibility: hidden;
+        }
+
+        #candy1 {
+            left: 10%;
+            top: 0;
+        }
+
+        #candy2 {
+            right: 10%;
+            top: 0;
+        }
+
+        .message {
+            font-size: 18px;
+            margin-top: 20px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .play-again {
+            display: none;
+            padding: 12px 20px;
+            margin-top: 30px;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .back-button {
+            background-color: #FF6699;
+            color: white;
+            border: none;
+            padding: 12px 16px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background 0.3s ease, transform 0.2s;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+
+        .back-button:hover {
+        background-color: #FF3366;
+        transform: scale(1.05);
+        }
+
+
+        @keyframes shuffle-left {
+            0%, 100% { transform: translateX(0) translateY(0) rotate(0deg); }
+            20% { transform: translateX(-30px) translateY(-20px) rotate(-15deg); }
+            50% { transform: translateX(60px) translateY(20px) rotate(15deg); }
+            80% { transform: translateX(-20px) translateY(-10px) rotate(-10deg); }
+        }
+
+        @keyframes shuffle-right {
+            0%, 100% { transform: translateX(0) translateY(0) rotate(0deg); }
+            20% { transform: translateX(30px) translateY(20px) rotate(15deg); }
+            50% { transform: translateX(-60px) translateY(-20px) rotate(-15deg); }
+            80% { transform: translateX(20px) translateY(10px) rotate(10deg); }
+        }
+
+        .shuffle-left {
+            animation: shuffle-left 1.5s ease-in-out 3;
+        }
+
+        .shuffle-right {
+            animation: shuffle-right 1.5s ease-in-out 3;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+    
+    <div class="box popup" id="popup">
+        <p><strong>This game reminds me of the first time we had dinner together.  😉, Cari gula gula yang sayang bagi baby🍓</strong></p>
+        <img src="Images/strawberry.jpg" alt="Strawberry Candy">
+        <button onclick="startGame()">Let's Play!</button>
+    </div>
+
+    <div class="box game-container" id="game-container">
+        <p><strong>Cuba teka mana satu ada gula sayang bagi baby? 🤔</strong></p>
+        <div class="fist-container">
+            <img src="Images/strawberry-candy.png" alt="Candy" class="candy" id="candy1">
+            <img src="Images/blueberry-candy.png" alt="Candy" class="candy" id="candy2">
+            <img src="Images/fist1.png" alt="Fist 1" class="fist shuffle-left" id="fist1" onclick="revealCandy(0)" style="left: 10%;">
+            <img src="Images/fist2.png" alt="Fist 2" class="fist shuffle-right" id="fist2" onclick="revealCandy(1)" style="right: 10%;">
+        </div>
+        <div class="message" id="message"></div>
+        <button class="play-again" id="play-again" onclick="restartGame()">Play Again 🔄</button>
+        <button class="back-button" onclick="goToMainMenu()">Back to Menu</button>
+
+    </div>
+
+    <script>
+        let candyPosition = 0;
+
+        function startGame() {
+            document.getElementById("popup").style.display = "none";
+            document.getElementById("game-container").style.display = "block";
+            shuffleCandy();
+        }
+
+        function shuffleCandy() {
+            let fist1 = document.getElementById("fist1");
+            let fist2 = document.getElementById("fist2");
+
+            fist1.classList.add("shuffle-left");
+            fist2.classList.add("shuffle-right");
+
+            setTimeout(() => {
+                fist1.classList.remove("shuffle-left");
+                fist2.classList.remove("shuffle-right");
+
+                let tempLeft = fist1.style.left;
+                fist1.style.left = fist2.style.right;
+                fist2.style.right = tempLeft;
+
+                candyPosition = Math.random() < 0.5 ? 0 : 1;
+            }, 2500);
+        }
+
+        function revealCandy(choice) {
+            document.getElementById("fist1").style.display = "none";
+            document.getElementById("fist2").style.display = "none";
+
+            document.getElementById("candy1").style.visibility = "visible";
+            document.getElementById("candy2").style.visibility = "visible";
+
+            let message = document.getElementById("message");
+message.style.marginTop = "60px"; // Adds spacing above the message
+
+if (choice === candyPosition) {
+    message.innerHTML = "Wahh pandaiinyaa my baby boo tekaa!,memang pandai teka keee";
+    message.style.color = "#28a745";
+} else {
+    message.innerHTML = "ehh calahh nii, ni gula-gula sayang suka tuuu😆 ";
+    message.style.color = "#dc3545";
+}
+
+            document.getElementById("play-again").style.display = "block";
+        }
+
+        function goToMainMenu() {
+    window.location.href = "Main.html";
+}
+
+function restartGame() {
+    document.getElementById("message").innerText = "";
+    document.getElementById("play-again").style.display = "none";
+    document.getElementById("fist1").style.display = "inline-block";
+    document.getElementById("fist2").style.display = "inline-block";
+    document.getElementById("candy1").style.visibility = "hidden";
+    document.getElementById("candy2").style.visibility = "hidden";
+
+    let candy1 = document.getElementById("candy1");
+    let candy2 = document.getElementById("candy2");
+
+    candy1.src = "Images/strawberry-candy.png";
+    candy2.src = "Images/blueberry-candy.png";
+
+    candyPosition = Math.random() < 0.5 ? 0 : 1;
+
+    if (candyPosition === 0) {
+        candy1.style.left = "10%";
+        candy1.style.right = "auto";
+        candy2.style.left = "auto";
+        candy2.style.right = "10%";
+    } else {
+        candy1.style.left = "auto";
+        candy1.style.right = "10%";
+        candy2.style.left = "10%";
+        candy2.style.right = "auto";
+    }
+}
+
+
+
+    </script>
+    
+</body>
+</html>

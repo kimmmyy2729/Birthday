@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Special Letter</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
+        body {
+            background: url('Images/letter-background.png') no-repeat center center fixed;
+            background-size: cover;
+            text-align: center;
+            font-family: 'Poppins', sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            color: white; /* Ensures text readability over the background */
+            text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.7);
+        }
+
+        .container {
+            position: relative;
+            text-align: center;
+            background: rgba(235, 141, 141, 0.5); /* Semi-transparent background */
+            padding: 20px;
+            border-radius: 10px;
+            width: 500px;
+            box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.3); /* Added shadow for depth */
+        }
+
+        .envelope, .letter {
+            width: 200px;
+            cursor: pointer;
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .envelope:hover, .letter:hover {
+            transform: scale(1.1);
+        }
+
+        .message {
+            margin-top: 10px;
+            font-size: 20px;
+        }
+
+        .back-button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #FF6699;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background 0.3s, box-shadow 0.3s;
+        }
+
+        .back-button:hover {
+            background-color: #E65C85;
+            box-shadow: 0px 4px 10px rgba(255, 102, 153, 0.5);
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <audio id="confettiSound" src="Sound/Confetti.mp3" preload="none"></audio>
+
+    <div class="container">
+        <img id="envelope" src="Images/envelope1.png" alt="Envelope" class="envelope" onclick="openLetter()">
+        <img id="letter" src="Images/envelope2.png" alt="Letter" class="letter hidden">
+        <div class="message">Open the envelop my love💌</div>
+    </div>
+
+    <a href="main.html" class="back-button">⬅ Back to Main Page</a>
+
+    <script>
+        function openLetter() {
+            triggerConfetti();
+            playConfettiSound();
+            document.getElementById('envelope').classList.add('hidden');
+            document.getElementById('letter').classList.remove('hidden');
+
+            setTimeout(() => {
+                window.open('Special-letter.pdf', '_blank', 'noopener,noreferrer');
+            }, 1000);
+        }
+
+        function triggerConfetti() {
+            confetti({
+                particleCount: 100,
+                spread: 70,
+                origin: { y: 0.6 }
+            });
+        }
+
+        function playConfettiSound() {
+            let sound = document.getElementById('confettiSound');
+            sound.play().catch(error => console.warn("Audio play prevented by browser:", error));
+        }
+    </script>
+</body>
+</html>
